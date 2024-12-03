@@ -1,44 +1,12 @@
-from models.team import Team
-from models.individual import Individual
+import numpy as np
 
 
-def calculate_team_performance(team: Team, metric="L1"):
-    if metric == "L1":
-        # Sum of preferences among team members
-        performance = sum(
-            team_member.get_preferences(other_member.id)
-            for team_member in team.members
-            for other_member in team.members
-            if team_member.id != other_member.id
-        )
-    elif metric == "L2":
-        # Euclidean norm of preferences
-        performance = sum(
-            team_member.get_preferences(other_member.id) ** 2
-            for team_member in team.members
-            for other_member in team.members
-            if team_member.id != other_member.id
-        )
-    elif metric == "Linf":
-        # Minimum preference among team members
-        performance = min(
-            team_member.get_preferences(other_member.id)
-            for team_member in team.members
-            for other_member in team.members
-            if team_member.id != other_member.id
-        )
-    else:
-        raise ValueError(f"Unknown metric: {metric}")
+def estimate_reward(beliefs: np.ndarray, action: np.ndarray):
+    team_interaction = action[:, None] == action
+    np.fill_diagonal(team_interaction, False)
 
-    return performance
+    return np.sum(beliefs * team_interaction) / 2
 
 
-def calculate_overall_performance(teams: list[Team], metric="L1"):
-    if metric in ["L1", "L2", "Linf"]:
-        total_performance = sum(
-            calculate_team_performance(team, metric) for team in teams
-        )
-    else:
-        raise ValueError(f"Unknown metric: {metric}")
-
-    return total_performance
+def calculate_distance(preferences: np.ndarray, beliefs: np.ndarray):
+    return np.mean((preferences - beliefs) ** 2)
