@@ -25,16 +25,15 @@ class NormalBelief:
         # Variables for estimating sigma_w
         self.sum_squared_deltas = np.zeros((num_individuals, num_individuals))
 
-        # Forgetting factor for variance estimation
-        self.alpha = 0.9
-
     def update(self, feedback_matrix: np.ndarray):
         """
         Update mean and variance based on feedback using Kalman Filter.
         """
+        feedback_matrix = np.nan_to_num(feedback_matrix, nan=0)
         # Make feedback filter
-        feedback_filter = ~np.isnan(feedback_matrix)
+        feedback_filter = feedback_matrix != 0
         np.fill_diagonal(feedback_filter, False)
+        # print("Feedback Filter:", feedback_filter)
         self.update_feedback_count(feedback_filter)
 
         # Update estimated values for sigma_f and sigma_w
@@ -48,7 +47,6 @@ class NormalBelief:
         # Phase 2: Update
         # Calculate innovation and Kalman gain
         innovation = (feedback_matrix - predicted_mean) * feedback_filter
-        innovation = np.nan_to_num(innovation, nan=0)
         kalman_gain = predicted_variance / (predicted_variance + sigma_f**2)
 
         # Update mean and variance
@@ -59,7 +57,6 @@ class NormalBelief:
         )
         # Avoid updating variance for self-feedback
         np.fill_diagonal(self.variance, 0)
-        np.fill_diagonal(self.mean, 0)
 
         # Step 6: Update sum_squared_deltas for sigma_w estimation
         delta_means = (self.mean - predicted_mean) * feedback_filter
@@ -77,7 +74,6 @@ class NormalBelief:
     def update_sigma_f(self, feedback_matrix: np.ndarray, feedback_filter: np.ndarray):
         # Compute residuals where feedback is observed
         residuals = feedback_filter * (feedback_matrix - self.mean)
-        residuals = np.nan_to_num(residuals, nan=0)
         # Update sums
         self.sum_residuals += residuals
         self.sum_squared_residuals += residuals**2
@@ -145,10 +141,10 @@ if __name__ == "__main__":
     # from normal_belief import NormalBelief  # Uncomment if NormalBelief is in a separate file
 
     # Parameters
-    num_individuals = 100  # Small number of individuals for testing
-    num_periods = 1000  # Number of time periods to simulate
-    true_sigma_w = 0.3  # True process noise standard deviation
-    true_sigma_f = 0.3  # True observation noise standard deviation
+    num_individuals = 1000  # Small number of individuals for testing
+    num_periods = 100  # Number of time periods to simulate
+    true_sigma_w = 0.1  # True process noise standard deviation
+    true_sigma_f = 0.1  # True observation noise standard deviation
 
     # Initialize the NormalBelief object without knowing true sigma_w and sigma_f
     belief = NormalBelief(num_individuals=num_individuals)
@@ -183,7 +179,7 @@ if __name__ == "__main__":
         process_noise = np.random.normal(
             0, true_sigma_w, size=(num_individuals, num_individuals)
         )
-        true_preferences += process_noise * feedback_filter
+        true_preferences += process_noise  # * feedback_filter
         np.fill_diagonal(true_preferences, 0)  # No self-preference
 
         # Simulate feedback observations with observation noise
@@ -211,10 +207,10 @@ if __name__ == "__main__":
     variances_over_time = np.array(variances_over_time)
 
     # Plot the true and estimated preferences over time for a specific pair
-    pair_indices = [(0, 1)]  # Pairs to plot
+    pair_indices = [(55, 33)]  # Pairs to plot
 
     for i, j in pair_indices:
-        plt.figure()
+        plt.figure(figsize=(8, 4))
         plt.plot(
             range(num_periods),
             true_preferences_over_time[:, i, j],
@@ -224,20 +220,22 @@ if __name__ == "__main__":
         # Add the variance as a shaded region
         plt.fill_between(
             range(num_periods),
-            estimated_means_over_time[:, i, j] - variances_over_time[:, i, j],
-            estimated_means_over_time[:, i, j] + variances_over_time[:, i, j],
+            estimated_means_over_time[:, i, j] - variances_over_time[:, i, j] ** 0.5,
+            estimated_means_over_time[:, i, j] + variances_over_time[:, i, j] ** 0.5,
             alpha=0.2,
+            label="Estimated Variance",
         )
         plt.plot(
             range(num_periods),
             estimated_means_over_time[:, i, j],
             label=f"Estimated Preference",
         )
-        plt.xlabel("Time Period")
+        plt.xlabel("Period")
         plt.ylabel("Preference")
-        plt.title(f"Preference Estimates for Pair ({i},{j})")
+        plt.title(f"Preference Estimates for Individual {i} and Individual {j}")
         plt.legend()
-        plt.show()
+        plt.savefig(f"results/preference_estimates_{i}_{j}.png")
+        plt.close()
 
     # Print final estimated variances and noise estimates
     print("Final Estimated Variances:")
@@ -256,7 +254,7 @@ if __name__ == "__main__":
     print(belief.num_feedback)
 
     # Plot the estimated sigma_f and sigma_w over time
-    plt.figure()
+    plt.figure(figsize=(8, 4))
     plt.plot(
         range(num_periods),
         estimated_sigma_f,
@@ -271,4 +269,5 @@ if __name__ == "__main__":
     plt.ylabel("Value")
     plt.title("Estimated Noise Parameters over Time")
     plt.legend()
-    plt.show()
+    plt.savefig("results/estimated_noise_parameters.png")
+    plt.close()
