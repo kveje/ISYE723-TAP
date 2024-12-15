@@ -1,7 +1,6 @@
 # agents/learners/bayesian_learner.py
 
 from ..beliefs.normal_belief import NormalBelief
-from ..beliefs.normal_beliefV2 import NormalBeliefV2
 
 
 class KalmanLearner:
@@ -13,7 +12,7 @@ class KalmanLearner:
             num_individuals (int): Total number of individuals.
         """
         num_individuals = env_config.num_individuals
-        self.normal_belief = NormalBeliefV2(num_individuals)
+        self.normal_belief = NormalBelief(num_individuals)
 
     def update(self, experience):
         """

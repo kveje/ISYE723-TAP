@@ -84,7 +84,7 @@ if __name__ == "__main__":
     import numpy as np
     import matplotlib.pyplot as plt
     from envs.env_config import EnvConfig
-    from ..beliefs.normal_belief import NormalBelief
+    from ..._OLD.normal_belief import NormalBelief
 
     # Assuming the NormalBelief class has been defined as per your latest code
     # from normal_belief import NormalBelief  # Uncomment if NormalBelief is in a separate file
