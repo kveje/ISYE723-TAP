@@ -3,10 +3,10 @@ from .base_actor import BaseActor
 from gurobipy import Model, GRB, quicksum
 
 
-class OptimizationActor(BaseActor):
+class UCBActor(BaseActor):
     def __init__(self, env_config, beta=0):
         """
-        Initialize the OptimizationActor with the environment configuration.
+        Initialize the UCB Actor with the environment configuration.
 
         Args:
             env_config (EnvConfig): The environment configuration.
@@ -99,7 +99,7 @@ if __name__ == "__main__":
     beliefs.update_beliefs(mean)
 
     # Create an OptimizationActor
-    actor = OptimizationActor(env_config)
+    actor = UCBActor(env_config)
 
     # Get team assignments
     action = actor.act(beliefs)
