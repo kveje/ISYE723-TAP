@@ -34,6 +34,7 @@ class UCBActor(BaseActor):
         # Create a new model
         model = Model("team-formation")
         model.setParam("OutputFlag", 0)
+        model.setParam("TimeLimit", 10)
 
         # Create variables
         x = {
@@ -72,6 +73,10 @@ class UCBActor(BaseActor):
             for j in range(num_teams)
             if x[i, j].x > 0.5
         ]
+
+        # Get time spent in solver
+        # time_spent = model.Runtime
+        # print(f"Time spent in solver: {time_spent}")
 
         # Erase model
         del model
