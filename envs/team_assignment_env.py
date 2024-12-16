@@ -16,6 +16,7 @@ class TeamAssignmentEnv(gym.Env):
         self.teams = list(range(env_config.number_teams))
         self.max_team_size = env_config.max_team_size
         self.num_periods = env_config.num_periods
+        self.random_substitution = env_config.random_substitution
 
         self.observation_space = (
             spaces.Box(
@@ -28,7 +29,10 @@ class TeamAssignmentEnv(gym.Env):
 
         self.current_period = 0
         self.individuals = Individuals(
-            self.num_individuals, env_config.sigma_w, env_config.sigma_f, env_config.sigma_p
+            self.num_individuals,
+            env_config.sigma_w,
+            env_config.sigma_f,
+            env_config.sigma_p,
         )
         self.state = np.zeros((self.num_individuals, self.num_individuals))
 
@@ -62,8 +66,15 @@ class TeamAssignmentEnv(gym.Env):
         # Check if the episode is done
         done = self.current_period >= self.num_periods
 
+        # Random substitution
+        random_probs = np.random.rand(self.num_individuals)
+        reset = random_probs < self.random_substitution
+        individuals_to_reset = np.where(reset)[0].tolist()
+        for i in individuals_to_reset:
+            self.individuals.reset_preferences(i)
+
         # Optional info dictionary # TODO: Add more info?
-        info = {}
+        info = {"reset": individuals_to_reset}
 
         return feedback, reward, done, info
 

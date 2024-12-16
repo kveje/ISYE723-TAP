@@ -12,3 +12,4 @@ class EnvConfig:
     sigma_f: float = 0.1
     sigma_p: float = 1
     metric: str = "L1"  # L1, L2 or Linf
+    random_substitution: float = 0
