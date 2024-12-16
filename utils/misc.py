@@ -8,5 +8,5 @@ def show_name(actor_type):
             return "Thompson"
         else:
             return actor_type
-    elif type(actor_type) == int:
+    else:
         return r"$\gamma =$" + f" {actor_type}"
