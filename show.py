@@ -1,4 +1,4 @@
-PATH = "results_4"
+PATH = "results"
 import numpy as np
 import matplotlib.pyplot as plt
 from utils.metrics import estimate_reward, calculate_distance
@@ -101,7 +101,7 @@ plot(
     cum_agg_estimated_rewards,
     x_label,
     "Cumulative Estimated Reward",
-    f"Cumulative Estimated {title}",
+    f"Cumulative Estimated Reward {title}",
     f"{PATH}/cumulative_estimated_rewards.png",
     color_map,
 )

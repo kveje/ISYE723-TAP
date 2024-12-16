@@ -65,6 +65,38 @@ for ACTOR in ACTORS:
         xlabel=x_label,
         ylabel="Reward",
         title=f"Reward {title}",
-        path=f"plots/{ACTOR}/actual_rewards.png",
+        path=f"plots/{ACTOR}_rewards.png",
+        color_map=color_map,
+    )
+    plot(
+        agg_estimated_rewards,
+        xlabel=x_label,
+        ylabel="Estimated Reward",
+        title=f"Estimated Reward {title}",
+        path=f"plots/{ACTOR}_estimated_rewards.png",
+        color_map=color_map,
+    )
+    plot(
+        agg_distances,
+        xlabel=x_label,
+        ylabel="Distance",
+        title=f"Preference Distance {title}",
+        path=f"plots/{ACTOR}_preference_distances.png",
+        color_map=color_map,
+    )
+    plot(
+        agg_times,
+        xlabel=x_label,
+        ylabel="Time",
+        title=f"Time {title}",
+        path=f"plots/{ACTOR}_times.png",
+        color_map=color_map,
+    )
+    plot(
+        cum_agg_actual_rewards,
+        xlabel=x_label,
+        ylabel="Cumulative Reward",
+        title=f"Cumulative Reward {title}",
+        path=f"plots/{ACTOR}_cumulative_rewards.png",
         color_map=color_map,
     )
