@@ -1,0 +1,22 @@
+{
+  "NUM_SIMULATIONS": 10,
+  "ACTORS": [
+    "UCB_0",
+    "UCB_0.1",
+    "UCB_0.5",
+    "UCB_1",
+    "UCB_2",
+    "UCB_5",
+    "Random",
+    "Thompson"
+  ],
+  "LEARNERS": ["Kalman"],
+  "NUM_INDIVIDUALS": 10,
+  "NUM_TEAMS": 4,
+  "MAX_TEAM_SIZE": 3,
+  "NUM_PERIODS": 100,
+  "SIGMA_F": 0.1,
+  "SIGMA_W": 0.1,
+  "SIGMA_P": 1,
+  "RANDOM_SUBSTITUTION": 0.0
+}
