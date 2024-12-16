@@ -1,4 +1,4 @@
-PATH = "results_2"
+PATH = "results_4"
 import numpy as np
 import matplotlib.pyplot as plt
 from utils.metrics import estimate_reward, calculate_distance
