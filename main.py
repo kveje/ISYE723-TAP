@@ -69,21 +69,21 @@ def test(env_config: EnvConfig, actor: object, learner: object):
 if __name__ == "__main__":
     NUM_SIMULATIONS = 10
     ACTORS = [
-        # "UCB_0",
-        # "UCB_0.1",
+        "UCB_0",
+        "UCB_0.1",
         "UCB_0.5",
         "Random",
         "Thompson",
     ]
     LEARNERS = ["Kalman"]
-    NUM_INDIVIDUALS = 20
-    NUM_TEAMS = 6
-    MAX_TEAM_SIZE = 4
+    NUM_INDIVIDUALS = 10
+    NUM_TEAMS = 4
+    MAX_TEAM_SIZE = 3
     NUM_PERIODS = 100
     SIGMA_F = 0.1
     SIGMA_W = 0.1
     SIGMA_P = 1
-    RANDOM_SUBSTITUTION = 0.0
+    RANDOM_SUBSTITUTION = 0.1
 
     # Create folders for storing results
     if not os.path.exists("results"):
