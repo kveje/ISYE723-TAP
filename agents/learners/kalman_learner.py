@@ -22,8 +22,8 @@ class KalmanLearner:
             experience (tuple): Contains (observation, action, reward, next_observation, done).
         """
         # Unpack the experience tuple
-        feedback, _, _, _ = experience
-        self.normal_belief.update(feedback)
+        feedback, _, _, _, info = experience
+        self.normal_belief.update(feedback, info)
 
     def get_means(self):
         """

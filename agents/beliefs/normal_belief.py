@@ -25,10 +25,15 @@ class NormalBelief:
         # Variables for estimating sigma_w
         self.sum_squared_deltas = np.zeros((num_individuals, num_individuals))
 
-    def update(self, feedback_matrix: np.ndarray):
+    def update(self, feedback_matrix: np.ndarray, info: dict = None):
         """
         Update mean and variance based on feedback using Kalman Filter.
         """
+        # Reset the belief for specific pairs
+        if len(info["reset"]) > 0:
+            for i in info["reset"]:
+                self.reset_individual(i)
+
         feedback_matrix = np.nan_to_num(feedback_matrix, nan=0)
         # Make feedback filter
         feedback_filter = feedback_matrix != 0
@@ -130,6 +135,27 @@ class NormalBelief:
         Retrieve the current variance estimates.
         """
         return self.variance
+
+    def reset_individual(self, individual):
+        """
+        Reset the belief for a specific individual.
+        """
+        # Reset estimates
+        self.mean[individual, :] = 0
+        self.variance[:, individual] = 1
+
+        # Reset statistics for sigma_f and sigma_w estimation
+        self.num_feedback[individual, :] = 0
+        self.num_feedback[:, individual] = 0
+
+        self.sum_residuals[individual, :] = 0
+        self.sum_residuals[:, individual] = 0
+
+        self.sum_squared_residuals[individual, :] = 0
+        self.sum_squared_residuals[:, individual] = 0
+
+        self.sum_squared_deltas[individual, :] = 0
+        self.sum_squared_deltas[:, individual] = 0
 
 
 if __name__ == "__main__":

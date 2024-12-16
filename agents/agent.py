@@ -29,8 +29,6 @@ class Agent(ABC):
         Returns:
             action: The action to take (e.g., team assignments).
         """
-        action = self.actor.act(self.learner)
-        # self.actions.append(action)
         return self.actor.act(self.learner)
 
     def learn(self, experience):
@@ -40,7 +38,7 @@ class Agent(ABC):
         Args:
             experience (tuple): A tuple containing (observation, action, reward, next_observation, done).
         """
-        observation, _, reward, _ = experience
+        # observation, _, reward, _, info = experience
         self.learner.update(experience)
 
     def get_beliefs(self):

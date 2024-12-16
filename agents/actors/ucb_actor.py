@@ -77,37 +77,3 @@ class UCBActor(BaseActor):
         del model
 
         return np.array(action)
-
-
-if __name__ == "__main__":
-    # Test the OptimizationActor class
-    import numpy as np
-    import matplotlib.pyplot as plt
-    from envs.env_config import EnvConfig
-    from ..._OLD.normal_belief import NormalBelief
-
-    # Assuming the NormalBelief class has been defined as per your latest code
-    # from normal_belief import NormalBelief  # Uncomment if NormalBelief is in a separate file
-
-    # Parameters
-    num_individuals = 100  # Small number of individuals for testing
-    num_teams = 10
-    max_team_size = 11
-    mean = np.random.rand(num_individuals, num_individuals)
-    env_config = EnvConfig(num_individuals, num_teams, max_team_size)
-    beliefs = NormalBelief(env_config)
-    beliefs.update_beliefs(mean)
-
-    # Create an OptimizationActor
-    actor = UCBActor(env_config)
-
-    # Get team assignments
-    action = actor.act(beliefs)
-
-    # Plot team assignments
-    plt.imshow(np.array(action).reshape(-1, num_individuals))
-    plt.colorbar()
-    plt.xlabel("Individuals")
-    plt.ylabel("Teams")
-    plt.title("Team Assignments")
-    plt.show()
