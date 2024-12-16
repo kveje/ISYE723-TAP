@@ -10,6 +10,7 @@ from utils.visualization import aggregate, plot
 import numpy as np
 import os
 import json
+import time
 
 
 def test(env_config: EnvConfig, actor: object, learner: object):
@@ -26,19 +27,21 @@ def test(env_config: EnvConfig, actor: object, learner: object):
     estimated_rewards = np.zeros(env_config.num_periods)
     period = 0
     preference_distances = np.zeros(env_config.num_periods)
+    times = np.zeros(env_config.num_periods)
 
     # Reset the environment
     observation = env.reset()
 
     while not done:
+        start = time.time()
         # Decide on an action
         action = agent.act()
 
         # Take a step in the environment
-        observation, reward, done, _ = env.step(action)
+        observation, reward, done, info = env.step(action)
 
         # Learn from the experience
-        agent.learn((observation, action, reward, done))
+        agent.learn((observation, action, reward, done, info))
 
         # Update the total reward
         total_reward += reward
@@ -52,41 +55,35 @@ def test(env_config: EnvConfig, actor: object, learner: object):
             env.individuals.get_true_preferences(),
             agent.learner.get_means(),
         )
-
+        end = time.time()
+        times[period] = end - start
         # Update period
         period += 1
 
         if period % 20 == 0:
             print(f"  Period {period} / {env_config.num_periods}")
 
-    return (
-        rewards,
-        estimated_rewards,
-        preference_distances,
-    )
+    return rewards, estimated_rewards, preference_distances, times
 
 
 if __name__ == "__main__":
     NUM_SIMULATIONS = 10
     ACTORS = [
-        "UCB_0",
-        "UCB_0.1",
+        # "UCB_0",
+        # "UCB_0.1",
         "UCB_0.5",
-        "UCB_1",
-        "UCB_2",
-        "UCB_5",
         "Random",
         "Thompson",
     ]
     LEARNERS = ["Kalman"]
-    NUM_INDIVIDUALS = 10
-    NUM_TEAMS = 4
-    MAX_TEAM_SIZE = 3
+    NUM_INDIVIDUALS = 20
+    NUM_TEAMS = 6
+    MAX_TEAM_SIZE = 4
     NUM_PERIODS = 100
-    SIGMA_F = 0.5
-    SIGMA_W = 0.5
+    SIGMA_F = 0.1
+    SIGMA_W = 0.1
     SIGMA_P = 1
-    RANDOM_SUBSTITUTION = 0.1
+    RANDOM_SUBSTITUTION = 0.0
 
     # Create folders for storing results
     if not os.path.exists("results"):
@@ -108,6 +105,7 @@ if __name__ == "__main__":
         "SIGMA_F": SIGMA_F,
         "SIGMA_W": SIGMA_W,
         "SIGMA_P": SIGMA_P,
+        "RANDOM_SUBSTITUTION": RANDOM_SUBSTITUTION,
     }
 
     # Save the config as json
@@ -124,6 +122,7 @@ if __name__ == "__main__":
         preference_distances = np.zeros(
             shape=(NUM_SIMULATIONS, NUM_PERIODS), dtype=np.float32
         )
+        times = np.zeros(shape=(NUM_SIMULATIONS, NUM_PERIODS), dtype=np.float32)
         print(f"Starting simlatuion with actor: {actor_type} and learner: Kalman")
         for i in range(NUM_SIMULATIONS):
             # Config
@@ -135,6 +134,7 @@ if __name__ == "__main__":
                 sigma_f=SIGMA_F,
                 sigma_w=SIGMA_W,
                 sigma_p=SIGMA_P,
+                random_substitution=RANDOM_SUBSTITUTION,
             )
 
             # Create the agent
@@ -151,12 +151,13 @@ if __name__ == "__main__":
             learner = KalmanLearner(env_config=env_config)
 
             # Test the agent
-            act_rewards, est_rewards, pref_dist = test(env_config, actor, learner)
+            act_rewards, est_rewards, pref_dist, t = test(env_config, actor, learner)
 
             # Store the results
             actual_rewards[i, :] = act_rewards
             estimated_rewards[i, :] = est_rewards
             preference_distances[i, :] = pref_dist
+            times[i, :] = t
 
             print(
                 f" Agent: {actor_type}, Simulation {i+1} / {NUM_SIMULATIONS} completed"
@@ -166,3 +167,4 @@ if __name__ == "__main__":
         np.save(f"results/{actor_type}/actual_rewards.npy", actual_rewards)
         np.save(f"results/{actor_type}/estimated_rewards.npy", estimated_rewards)
         np.save(f"results/{actor_type}/preference_distances.npy", preference_distances)
+        np.save(f"results/{actor_type}/times.npy", times)
